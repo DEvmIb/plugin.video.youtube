@@ -8,6 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 from six.moves import range
 from six import PY2
 from six.moves import urllib
@@ -556,7 +561,7 @@ class VideoInfo(object):
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
         result = requests.get(url, headers=headers, verify=self._verify,
-                              cookies=cookies, allow_redirects=True)
+                              cookies=cookies, allow_redirects=True, proxies=proxies)
 
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
@@ -570,7 +575,7 @@ class VideoInfo(object):
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
         result = requests.get(url, headers=headers, verify=self._verify,
-                              cookies=cookies, allow_redirects=True)
+                              cookies=cookies, allow_redirects=True, proxies=proxies)
 
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
@@ -653,7 +658,7 @@ class VideoInfo(object):
             return cached_js
 
         headers = self.MOBILE_HEADERS.copy()
-        result = requests.get(javascript_url, headers=headers, verify=False, allow_redirects=True)
+        result = requests.get(javascript_url, headers=headers, verify=False, allow_redirects=True, proxies=proxies)
         javascript = result.text
 
         self._data_cache.set(javascript_url, cache_key)
@@ -685,7 +690,7 @@ class VideoInfo(object):
             playback_stats = {}
 
         try:
-            result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
+            result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True, proxies=proxies)
             result.raise_for_status()
         except:
             # Failed to get the M3U8 playlist file. Add a log debug in this case?
@@ -740,17 +745,15 @@ class VideoInfo(object):
         #                                   'hl': self.language}}}
 
         payload = {'videoId': video_id,
-                   'context': {'client': {'clientVersion': '16.49', 'gl': self.region,
-                                          'clientName': 'ANDROID', 'hl': self.language}},
-                   'thirdParty': {'embedUrl': 'https://google.com'}
-        }
+                   'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
+                                          'clientName': 'ANDROID', 'hl': self.language}}}
 
         player_response = {}
         for attempt in range(2):
             try:
                 r = requests.post(video_info_url, params=params, json=payload,
                                   headers=headers, verify=self._verify, cookies=None,
-                                  allow_redirects=True)
+                                  allow_redirects=True, proxies=proxies)
                 r.raise_for_status()
                 player_response = r.json()
                 if player_response.get('playabilityStatus', {}).get('status', 'OK') == 'AGE_CHECK_REQUIRED' \

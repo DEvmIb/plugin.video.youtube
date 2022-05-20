@@ -8,6 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 from six.moves import urllib
 
 import time
@@ -83,7 +88,7 @@ class LoginClient(object):
         # url
         url = 'https://accounts.google.com/o/oauth2/revoke'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify, proxies=proxies)
 
         try:
             json_data = result.json()
@@ -125,7 +130,7 @@ class LoginClient(object):
         context.log_debug('Refresh token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s|' %
                           (config_type, client_id[:5], client_secret[:5]))
 
-        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify, proxies=proxies)
 
         try:
             json_data = result.json()
@@ -179,7 +184,7 @@ class LoginClient(object):
         context.log_debug('Requesting access token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s|' %
                           (config_type, client_id[:5], client_secret[:5]))
 
-        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify, proxies=proxies)
 
         authorization_pending = False
         try:
@@ -233,7 +238,7 @@ class LoginClient(object):
         context.log_debug('Requesting device and user code: Config: |%s| Client id [:5]: |%s|' %
                           (config_type, client_id[:5]))
 
-        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify, proxies=proxies)
 
         try:
             json_data = result.json()
@@ -299,7 +304,7 @@ class LoginClient(object):
         # url
         url = 'https://android.clients.google.com/auth'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify, proxies=proxies)
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 

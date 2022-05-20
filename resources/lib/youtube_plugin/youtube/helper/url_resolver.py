@@ -8,6 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 from six.moves import urllib
 
 import re
@@ -60,7 +65,7 @@ class YouTubeResolver(AbstractResolver):
                            'DNT': '1',
                            'Accept-Encoding': 'gzip, deflate',
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.get(url, headers=headers, verify=self._verify)
+                response = requests.get(url, headers=headers, verify=self._verify, proxies=proxies)
                 if response.status_code == 200:
                     match = re.search(r'<meta itemprop="channelId" content="(?P<channel_id>.+)">', response.text)
                     if match:
@@ -105,7 +110,7 @@ class CommonResolver(AbstractResolver, list):
                            'DNT': '1',
                            'Accept-Encoding': 'gzip, deflate',
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=False)
+                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=False, proxies=proxies)
                 if response.status_code == 304:
                     return url
 
@@ -130,21 +135,6 @@ class CommonResolver(AbstractResolver, list):
                     location = headers.get('Location', '')
                     if location:
                         return _loop(location, tries=tries - 1)
-
-                if response.status_code == 200:
-                    _url_components = urllib.parse.urlparse(_url)
-                    if _url_components.path == '/supported_browsers':
-                        # "sometimes", we get a redirect through an URL of the form https://.../supported_browsers?next_url=<urlencoded_next_url>&further=paramaters&stuck=here
-                        # put together query string from both what's encoded inside next_url and the remaining paramaters of this URL...
-                        _query = urllib.parse.parse_qs(_url_components.query) # top-level query string
-                        _nc = urllib.parse.urlparse(_query['next_url'][0]) # components of next_url
-                        _next_query = urllib.parse.parse_qs(_nc.query) # query string encoded inside next_url
-                        del _query['next_url'] # remove next_url from top level query string
-                        _next_query.update(_query) # add/overwrite all other params from top level query string
-                        _next_query = dict(map(lambda kv : (kv[0], kv[1][0]), _next_query.items())) # flatten to only use first argument of each param
-                        _next_url = urllib.parse.urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urllib.parse.urlencode(_next_query), _nc.fragment)) # build new URL from these components
-                        return _next_url
-
             except:
                 # do nothing
                 pass

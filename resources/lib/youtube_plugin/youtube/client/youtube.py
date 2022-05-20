@@ -8,6 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 import copy
 import json
 import re
@@ -91,7 +96,7 @@ class YouTube(LoginClient):
             params['access_token'] = self._access_token
 
         try:
-            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True, proxies=proxies)
         except:
             _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
@@ -826,7 +831,7 @@ class YouTube(LoginClient):
 
                 def fetch_xml(_url, _responses):
                     try:
-                        _response = requests.get(_url, {}, headers=headers, verify=self._verify, allow_redirects=True)
+                        _response = requests.get(_url, {}, headers=headers, verify=self._verify, allow_redirects=True, proxies=proxies)
                     except:
                         _response = None
                         _context.log_error('Failed |%s|' % traceback.print_exc())
@@ -952,18 +957,18 @@ class YouTube(LoginClient):
             log_params['location'] = 'xx.xxxx,xx.xxxx'
         _context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
         if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
+            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects, proxies=proxies)
         elif method == 'POST':
             _headers['content-type'] = 'application/json'
             result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                   allow_redirects=allow_redirects)
+                                   allow_redirects=allow_redirects, proxies=proxies)
         elif method == 'PUT':
             _headers['content-type'] = 'application/json'
             result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                  allow_redirects=allow_redirects)
+                                  allow_redirects=allow_redirects, proxies=proxies)
         elif method == 'DELETE':
             result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
-                                     allow_redirects=allow_redirects)
+                                     allow_redirects=allow_redirects, proxies=proxies)
 
         _context.log_debug('[data] v3 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
 
@@ -1013,18 +1018,18 @@ class YouTube(LoginClient):
 
         _context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
         if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
+            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects, proxies=proxies)
         elif method == 'POST':
             _headers['content-type'] = 'application/json'
             result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                   allow_redirects=allow_redirects)
+                                   allow_redirects=allow_redirects, proxies=proxies)
         elif method == 'PUT':
             _headers['content-type'] = 'application/json'
             result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                  allow_redirects=allow_redirects)
+                                  allow_redirects=allow_redirects, proxies=proxies)
         elif method == 'DELETE':
             result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
-                                     allow_redirects=allow_redirects)
+                                     allow_redirects=allow_redirects, proxies=proxies)
 
         if result is None:
             return {}

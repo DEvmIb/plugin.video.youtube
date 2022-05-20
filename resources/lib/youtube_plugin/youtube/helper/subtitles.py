@@ -6,6 +6,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
@@ -205,7 +210,7 @@ class Subtitles(object):
                 return [subtitle_url]
             else:
                 result_auto = requests.get(subtitle_url, headers=self.headers,
-                                           verify=self._verify, allow_redirects=True)
+                                           verify=self._verify, allow_redirects=True, proxies=proxies)
 
                 if result_auto.text:
                     self.context.log_debug('Subtitle found for: %s' % language)
@@ -227,14 +232,19 @@ class Subtitles(object):
                 lang_name = track_name[0].get('text')
 
         if lang_name:
-            return self._recode_language_name(lang_name)
+            return self._decode_language_name(lang_name)
 
         return None
 
     @staticmethod
-    def _recode_language_name(language_name):
+    def _decode_language_name(language_name):
+        language_name = language_name.encode('raw_unicode_escape')
+
         if PY2:
-            language_name = language_name.encode('utf-8')
+            language_name = language_name.decode('utf-8')
+
+        else:
+            language_name = language_name.decode('raw_unicode_escape')
 
         return language_name
 

@@ -7,6 +7,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 import requests
 
 
@@ -22,7 +27,7 @@ class Locator:
 
     def locate_requester(self):
         request_url = '/'.join([self._base_url, 'json'])
-        response = requests.get(request_url)
+        response = requests.get(request_url, proxies=proxies)
         self._response = response.json()
 
     def success(self):

@@ -7,6 +7,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+proxies = {
+    "http" : "http://10.21.200.106:8080",
+    "https" : "http://10.21.200.106:8080"
+}
+
 from six.moves import BaseHTTPServer
 from six.moves.urllib.parse import parse_qs, urlparse
 from six.moves import range
@@ -210,7 +215,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 'Authorization': 'Bearer %s' % license_token
             }
 
-            result = requests.post(url=license_url, headers=li_headers, data=post_data, stream=True)
+            result = requests.post(url=license_url, headers=li_headers, data=post_data, stream=True, proxies=proxies)
 
             response_length = int(result.headers.get('content-length'))
             content = result.raw.read(response_length)
@@ -468,7 +473,7 @@ def get_http_server(address=None, port=None):
     except socket.error as e:
         logger.log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'.format(address=address, port=port, response=str(e)))
         xbmcgui.Dialog().notification(addon.getAddonInfo('name'), str(e),
-                                      "{}/icon.png".format(addon.getAddonInfo('path')),
+                                      xbmc.translatePath('special://home/addons/{0!s}/icon.png'.format(addon.getAddonInfo('id'))),
                                       5000, False)
         return None
 
